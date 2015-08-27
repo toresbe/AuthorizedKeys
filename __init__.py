@@ -43,13 +43,21 @@ class SSHAuthorizedKeysFile():
             self.keys = []
 
     def append(self, keydata):
-        if keydata in [k.keydata for k in self.keys]:
-            raise ValueError('Key already in file')
+        if type(keydata) is str:
+            if keydata in [k.keydata for k in self.keys]:
+                raise ValueError('Key already in file')
+            try:
+                key = SSHAuthorizedKeysEntry(keydata)
+            except Exception as e:
+                raise ValueError(e)
 
-        try:
-            key = SSHAuthorizedKeysEntry(keydata)
-        except Exception as e:
-            raise ValueError(e)
+        elif type(keydata) is SSHAuthorizedKeysEntry:
+            key = keydata
+            if key.keydata in [k.keydata.strip() for k in self.keys]:
+                raise ValueError('Key already in file')
+
+        else:
+            raise TypeError('keydata must be string or SSH Key object')
 
         open(self.filename, 'a').write(key.keydata + '\n')
         self.keys.append(key)
