@@ -33,6 +33,7 @@ class SSHAuthorizedKeysFile():
 
         if not isdir(ssh_path):
             os.mkdir(ssh_path)
+            os.chmod(ssh_path, 0700)
             os.chown(ssh_path, user.pw_uid, user.pw_gid)
         
         self.filename = ssh_path + 'authorized_keys'
